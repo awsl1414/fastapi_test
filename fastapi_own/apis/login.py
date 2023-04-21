@@ -3,12 +3,13 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 import models
 from core import verify_password, create_access_token
+from core.deps import oauth2_scheme
 
 login = APIRouter(tags=["登录相关"])
 
 
 @login.post("/login", summary="登录")
-async def user_login(form_data: OAuth2PasswordRequestForm = Depends()):
+async def user_login(form_data: OAuth2PasswordRequestForm = Depends(oauth2_scheme)):
     if user := await models.User.get(username=form_data.username):
         if verify_password(form_data.password, user.password):
             token = create_access_token({"sub": user.username})
